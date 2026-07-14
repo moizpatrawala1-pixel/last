@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>for you</title>
+<style>
+  :root{
+    --blush: #fdf1f3;
+    --petal: #f7d9e0;
+    --rose: #e8a3b3;
+    --rose-deep: #c96a82;
+    --ink: #4a3038;
+    --ink-soft: #8a6a72;
+    --cream: #fffaf9;
+    --gold: #e0b8a0;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    background: var(--blush);
+    color: var(--ink);
+    overflow-x:hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+
+  /* floating petals background */
+  .petals{
+    position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden;
+  }
+  .petal{
+    position:absolute; top:-5%;
+    font-size:18px; opacity:0.5;
+    animation: fall linear infinite;
+    color: var(--rose);
+    user-select:none;
+  }
+  @keyframes fall{
+    0%{ transform: translateY(-10vh) rotate(0deg); }
+    100%{ transform: translateY(110vh) rotate(360deg); }
+  }
+
+  section{
+    position:relative; z-index:2;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 8vh 6vw;
+    text-align:center;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero h1{
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    font-weight:400;
+    letter-spacing:0.5px;
+    color: var(--rose-deep);
+    font-style:italic;
+    opacity:0;
+    animation: riseIn 1.4s ease forwards 0.3s;
+  }
+  .hero p{
+    margin-top:1.2rem;
+    font-size:1.05rem;
+    color:var(--ink-soft);
+    max-width:420px;
+    line-height:1.7;
+    opacity:0;
+    animation: riseIn 1.4s ease forwards 0.9s;
+  }
+  @keyframes riseIn{
+    from{opacity:0; transform:translateY(18px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .hero .mark{
+    margin-top:3rem;
+    font-size:0.75rem;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    opacity:0;
+    animation: riseIn 1.4s ease forwards 1.4s;
+  }
+  .scroll-cue{
+    margin-top:0.6rem;
+    width:1px; height:40px;
+    background: linear-gradient(var(--rose), transparent);
+    opacity:0;
+    animation: riseIn 1s ease forwards 1.8s, pulseLine 2s ease-in-out infinite 2.8s;
+  }
+  @keyframes pulseLine{ 0%,100%{opacity:0.3;} 50%{opacity:0.9;} }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section-label{
+    font-size:0.7rem;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    color: var(--rose-deep);
+    margin-bottom:0.8rem;
+    opacity:0.8;
+  }
+  .section-title{
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-style:italic;
+    font-weight:400;
+    color:var(--ink);
+    max-width:600px;
+    line-height:1.4;
+    margin-bottom: 3rem;
+  }
+
+  .fade-up{
+    opacity:0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  .fade-up.visible{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  /* ---------- GALLERY ---------- */
+  .gallery-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.4rem;
+    max-width: 1100px;
+    width:100%;
+  }
+  .frame{
+    position:relative;
+    aspect-ratio: 4/5;
+    background: var(--cream);
+    border-radius: 6px;
+    overflow:hidden;
+    box-shadow: 0 12px 30px -12px rgba(201,106,130,0.35);
+    border: 6px solid var(--cream);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+  }
+  .frame:hover{
+    transform: translateY(-6px) rotate(-0.5deg);
+    box-shadow: 0 20px 40px -14px rgba(201,106,130,0.5);
+  }
+  .frame img{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .frame .ph-label{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:0.4rem;
+    background: linear-gradient(160deg, var(--petal), var(--blush));
+    color: var(--rose-deep);
+    font-size:0.75rem;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+  }
+  .frame .ph-label span.big{
+    font-family: Georgia, serif;
+    font-style:italic;
+    font-size:1.3rem;
+    text-transform:none;
+    letter-spacing:0;
+  }
+  .frame figcaption{
+    position:absolute; bottom:0; left:0; right:0;
+    padding: 0.9rem 0.8rem 0.7rem;
+    background: linear-gradient(to top, rgba(74,48,56,0.55), transparent);
+    color:#fff;
+    font-size:0.8rem;
+    font-style:italic;
+    opacity:0;
+    transition: opacity 0.4s ease;
+    text-align:left;
+  }
+  .frame:hover figcaption{ opacity:1; }
+
+  /* ---------- VIDEO MOMENTS ---------- */
+  .video-strip{
+    display:flex;
+    gap:1.4rem;
+    overflow-x:auto;
+    max-width:1100px;
+    width:100%;
+    padding: 1rem 0.5rem 1.5rem;
+    scroll-snap-type: x mandatory;
+  }
+  .video-strip::-webkit-scrollbar{ height:6px; }
+  .video-strip::-webkit-scrollbar-thumb{ background: var(--petal); border-radius:3px; }
+
+  .vcard{
+    flex: 0 0 260px;
+    scroll-snap-align:center;
+    background: var(--cream);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow: 0 12px 30px -14px rgba(201,106,130,0.3);
+  }
+  .vcard video{
+    width:100%;
+    aspect-ratio: 9/16;
+    object-fit:cover;
+    display:block;
+    background: var(--petal);
+  }
+  .vcard .vfallback{
+    width:100%; aspect-ratio:9/16;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(160deg, var(--petal), var(--blush));
+    color:var(--rose-deep);
+    font-size:0.85rem;
+    letter-spacing:1px;
+    flex-direction:column; gap:0.5rem;
+  }
+  .vcard p{
+    padding: 0.8rem 1rem 1rem;
+    font-size:0.85rem;
+    font-style:italic;
+    color: var(--ink-soft);
+    text-align:left;
+  }
+
+  /* ---------- LETTER ---------- */
+  .letter{
+    max-width: 620px;
+    background: var(--cream);
+    border-radius: 14px;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    box-shadow: 0 20px 50px -20px rgba(201,106,130,0.4);
+    position:relative;
+  }
+  .letter::before{
+    content: "❦";
+    display:block;
+    font-size:1.6rem;
+    color: var(--rose);
+    margin-bottom:1rem;
+  }
+  .letter p{
+    font-size:1.05rem;
+    line-height:1.95;
+    color: var(--ink);
+    text-align:left;
+    margin-bottom:1.2rem;
+  }
+  .letter .sign{
+    text-align:right;
+    font-style:italic;
+    color:var(--rose-deep);
+    margin-top:1.5rem;
+    font-size:1.1rem;
+  }
+
+  /* ---------- MUSIC PLAYER ---------- */
+  .player{
+    position:fixed;
+    bottom: 22px; right: 22px;
+    z-index:50;
+    display:flex; align-items:center; gap:0.7rem;
+    background: rgba(255,250,249,0.9);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--petal);
+    padding: 0.6rem 1rem 0.6rem 0.6rem;
+    border-radius: 40px;
+    box-shadow: 0 10px 30px -12px rgba(201,106,130,0.4);
+  }
+  .player button{
+    width:38px; height:38px;
+    border-radius:50%;
+    border:none;
+    background: var(--rose-deep);
+    color:#fff;
+    font-size:1rem;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: transform 0.3s ease, background 0.3s ease;
+  }
+  .player button:hover{ transform: scale(1.08); background:var(--rose); }
+  .player span{
+    font-size:0.75rem;
+    letter-spacing:1px;
+    color: var(--ink-soft);
+    font-style:italic;
+    max-width:120px;
+  }
+  .note-icon{
+    display:inline-block;
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);} }
+
+  /* ---------- CHOICE ---------- */
+  .choice-box{
+    max-width:520px;
+    width:100%;
+  }
+  .choice-buttons{
+    display:flex;
+    gap:1.2rem;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-top:2.5rem;
+  }
+  .choice-buttons button{
+    font-family:inherit;
+    font-size:1rem;
+    padding: 0.9rem 2rem;
+    border-radius: 40px;
+    cursor:pointer;
+    border:1.5px solid var(--rose-deep);
+    background:transparent;
+    color: var(--rose-deep);
+    transition: all 0.35s ease;
+    letter-spacing:0.5px;
+  }
+  .choice-buttons button.primary{
+    background: var(--rose-deep);
+    color:#fff;
+  }
+  .choice-buttons button:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px -10px rgba(201,106,130,0.6);
+  }
+  .response{
+    margin-top:2.5rem;
+    font-style:italic;
+    color: var(--ink-soft);
+    font-size:1.05rem;
+    max-width:480px;
+    line-height:1.8;
+    opacity:0;
+    transition: opacity 0.8s ease;
+  }
+  .response.show{ opacity:1; }
+
+  footer{
+    text-align:center;
+    padding: 3rem 1rem 4rem;
+    font-size:0.75rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color: var(--ink-soft);
+    opacity:0.7;
+  }
+
+  @media (max-width:600px){
+    .player{ bottom:14px; right:14px; padding:0.5rem 0.8rem 0.5rem 0.5rem; }
+    .player span{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="petals" id="petals"></div>
+
+<!-- Background Music -->
+<div class="player">
+  <button id="playBtn" aria-label="Play song">▶</button>
+  <span><span class="note-icon">♪</span> our song</span>
+</div>
+<audio id="bgAudio" src="song.mp3" loop preload="none"></audio>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <h1>for you, always</h1>
+  <p>A little collection of everything we've been through together —<br>
+  before this next chapter begins.</p>
+  <div class="mark">scroll gently</div>
+  <div class="scroll-cue"></div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section id="gallery">
+  <div class="section-label fade-up">Moments</div>
+  <h2 class="section-title fade-up">Sixteen little pieces of us</h2>
+  <div class="gallery-grid fade-up" id="galleryGrid"></div>
+</section>
+
+<!-- ============ VIDEOS ============ -->
+<section id="videos">
+  <div class="section-label fade-up">Replays</div>
+  <h2 class="section-title fade-up">The moments we caught on camera</h2>
+  <div class="video-strip fade-up" id="videoStrip"></div>
+</section>
+
+<!-- ============ LETTER ============ -->
+<section id="letter">
+  <div class="section-label fade-up">One Last Thing</div>
+  <div class="letter fade-up">
+    <p>I don't really know how to say this without sounding like a movie, so I'll just say it plainly: thank you. For the version of me you brought out, for every silly photo, every drive, every late night that turned into a memory without either of us noticing.</p>
+    <p>Whatever today ends up being — I just wanted you to have this. Not to change anything. Just so you know it mattered, and it still does.</p>
+    <p class="sign">— always, me</p>
+  </div>
+</section>
+
+<!-- ============ CHOICE / CLOSING ============ -->
+<section id="choice">
+  <div class="choice-box">
+    <div class="section-label fade-up">Today</div>
+    <h2 class="section-title fade-up">One more day, just because?</h2>
+    <p class="fade-up" style="color:var(--ink-soft); font-size:0.95rem; max-width:440px; margin:0 auto;">
+      No pressure either way — this page already did what it needed to do.
+    </p>
+    <div class="choice-buttons fade-up">
+      <button class="primary" onclick="respond('yes')">I'd love to</button>
+      <button onclick="respond('no')">Not today</button>
+    </div>
+    <p class="response" id="responseText"></p>
+  </div>
+</section>
+
+<footer>made with the good kind of nostalgia</footer>
+
+<script>
+  // ---------- Floating petals ----------
+  const petalsContainer = document.getElementById('petals');
+  const petalChars = ['❀','✿','❁','⚘'];
+  for(let i=0;i<14;i++){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.textContent = petalChars[Math.floor(Math.random()*petalChars.length)];
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.fontSize = (12 + Math.random()*14) + 'px';
+    p.style.animationDuration = (10 + Math.random()*12) + 's';
+    p.style.animationDelay = (Math.random()*10) + 's';
+    petalsContainer.appendChild(p);
+  }
+
+  // ---------- Gallery: photos 0.jpg – 15.jpg ----------
+  const galleryGrid = document.getElementById('galleryGrid');
+  const captions = [
+    "the first one", "that afternoon", "you laughing at nothing",
+    "we got lost", "best day", "unplanned but perfect",
+    "golden hour", "you weren't ready for this photo",
+    "the drive back", "that place we loved", "just us",
+    "the surprise", "rainy day, good day", "loud laughing",
+    "quiet moment", "one for the memory"
+  ];
+  for(let i=0;i<=15;i++){
+    const fig = document.createElement('figure');
+    fig.className = 'frame';
+    fig.innerHTML = `
+      <img src="${i}.jpg" alt="memory ${i}"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="ph-label" style="display:none;">
+        <span class="big">${i}</span>
+        <span>${i}.jpg</span>
+      </div>
+      <figcaption>${captions[i] || 'a memory'}</figcaption>
+    `;
+    galleryGrid.appendChild(fig);
+  }
+
+  // ---------- Videos: 0.mp4 – 8.mp4 ----------
+  const videoStrip = document.getElementById('videoStrip');
+  const vCaptions = [
+    "the one that always makes me laugh", "you didn't know I was filming",
+    "the trip", "golden hour, again", "your reaction to this",
+    "the surprise", "just being us", "loudest laugh on record",
+    "the last one before we go"
+  ];
+  for(let i=0;i<=8;i++){
+    const card = document.createElement('div');
+    card.className = 'vcard';
+    card.innerHTML = `
+      <video controls preload="none" playsinline
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <source src="${i}.mp4" type="video/mp4">
+      </video>
+      <div class="vfallback" style="display:none;">
+        <span style="font-size:1.4rem;">▷</span>
+        <span>${i}.mp4</span>
+      </div>
+      <p>${vCaptions[i] || 'a moment worth keeping'}</p>
+    `;
+    videoStrip.appendChild(card);
+  }
+
+  // ---------- Scroll reveal ----------
+  const revealEls = document.querySelectorAll('.fade-up');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el=>io.observe(el));
+
+  // ---------- Music player ----------
+  const audio = document.getElementById('bgAudio');
+  const playBtn = document.getElementById('playBtn');
+  let playing = false;
+  playBtn.addEventListener('click', ()=>{
+    if(!playing){
+      audio.play().catch(()=>{});
+      playBtn.textContent = '❚❚';
+    } else {
+      audio.pause();
+      playBtn.textContent = '▶';
+    }
+    playing = !playing;
+  });
+
+  // ---------- Closing response ----------
+  function respond(choice){
+    const el = document.getElementById('responseText');
+    if(choice === 'yes'){
+      el.textContent = "Then I'll see you soon. Can't wait. 🤍";
+    } else {
+      el.textContent = "That's okay too. This page is yours either way — no strings attached. Take care of yourself. 🤍";
+    }
+    el.classList.add('show');
+  }
+</script>
+
+</body>
+</html>
