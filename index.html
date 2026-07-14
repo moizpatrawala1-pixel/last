@@ -446,11 +446,11 @@
     const fig = document.createElement('figure');
     fig.className = 'frame';
     fig.innerHTML = `
-      <img src="photos/${i}.jpg" alt="memory ${i}"
+      <img src="photos/${i}.JPG" alt="memory ${i}"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
       <div class="ph-label" style="display:none;">
         <span class="big">${i}</span>
-        <span>photos/${i}.jpg</span>
+        <span>photos/${i}.JPG</span>
       </div>
       <figcaption>${captions[i] || 'a memory'}</figcaption>
     `;
