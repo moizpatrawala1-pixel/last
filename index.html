@@ -75,30 +75,22 @@
     line-height: 1.7;
   }
 
-  .hero .tap-note{
+  .pill-btn{
     margin-top: 40px;
     font-size: 0.75rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--pink);
     cursor: pointer;
-    padding: 12px 28px;
+    padding: 14px 30px;
     border: 1.5px solid var(--pink-light);
     border-radius: 40px;
     background: var(--card);
+    font-family: 'Poppins', sans-serif;
     transition: transform 0.2s ease, background 0.2s ease;
   }
 
-  .hero .tap-note:hover{ transform: translateY(-2px); background: var(--pink-pale); }
-  .hero .tap-note.playing{ opacity: 0; pointer-events: none; height: 0; margin: 0; overflow: hidden; }
-
-  .scroll-cue{
-    margin-top: 40px;
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
+  .pill-btn:hover{ transform: translateY(-2px); background: var(--pink-pale); }
 
   /* ---------- section headers ---------- */
   .section-head{
@@ -231,7 +223,7 @@
     position: absolute;
     bottom: 14px;
     right: 14px;
-    background: rgba(122, 46, 66, 0.55);
+    background: rgba(122, 46, 66, 0.6);
     color: white;
     font-size: 0.65rem;
     letter-spacing: 0.08em;
@@ -244,6 +236,11 @@
   }
 
   .sound-tag.hide{ display: none; }
+
+  .next-wrap{
+    text-align: center;
+    margin-top: 56px;
+  }
 
   /* ---------- persistent mini player ---------- */
   .mini-player{
@@ -258,7 +255,12 @@
     border-radius: 40px;
     padding: 8px 16px 8px 8px;
     box-shadow: 0 12px 30px var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
   }
+
+  .mini-player.show{ opacity: 1; pointer-events: auto; }
 
   .mini-vinyl{
     width: 34px;
@@ -286,11 +288,7 @@
     font-family: 'Poppins', sans-serif;
   }
 
-  .next-wrap{
-    text-align: center;
-    margin-top: 56px;
-  }
-
+  /* ---------- letter + closing (revealed after videos) ---------- */
   .after-videos{
     display: none;
   }
@@ -305,7 +303,6 @@
     to{ opacity: 1; transform: translateY(0); }
   }
 
-  /* ---------- letter ---------- */
   .letter{ max-width: 640px; }
 
   .letter p{
@@ -314,7 +311,6 @@
     color: var(--ink);
   }
 
-  /* ---------- closing ---------- */
   .closing{
     text-align: center;
     padding-bottom: 140px;
@@ -399,7 +395,7 @@
   <span class="eyebrow">one more day, just us</span>
   <h1>every little thing<br>we did together</h1>
   <p>I put it all in one place — the photos, the clips, the song. Scroll down.</p>
-  <button class="tap-note" id="startBtn">tap to begin ♥</button>
+  <button class="pill-btn" id="startBtn">tap to begin ♥</button>
 </section>
 
 <!-- PHOTOS -->
@@ -425,63 +421,60 @@
   </div>
   <div class="video-strip" id="videoStrip"></div>
   <div class="next-wrap">
-    <button class="tap-note" id="nextBtn">next ♥</button>
+    <button class="pill-btn" id="nextBtn">next ♥</button>
   </div>
 </section>
 
 <!-- LETTER + CLOSING, revealed after tapping next -->
 <div id="afterVideos" class="after-videos">
 
-<!-- LETTER -->
-<section>
-  <div class="letter">
-    <p id="letterText"></p>
-  </div>
-</section>
+  <section>
+    <div class="letter">
+      <p id="letterText"></p>
+    </div>
+  </section>
 
-<!-- CLOSING -->
-<section class="closing">
-  <h2 id="closingQuestion">so, one more date?</h2>
-  <div class="choices" id="choices">
-    <button class="btn btn-primary" id="yesBtn">yes</button>
-    <button class="btn btn-secondary" id="noBtn">no</button>
-  </div>
-  <div class="response-note" id="responseNote"></div>
-</section>
+  <section class="closing">
+    <h2>so, one more date?</h2>
+    <div class="choices" id="choices">
+      <button class="btn btn-primary" id="yesBtn">yes</button>
+      <button class="btn btn-secondary" id="noBtn">no</button>
+    </div>
+    <div class="response-note" id="responseNote"></div>
+  </section>
 
 </div>
 
 <footer>made with a lot of memory and a little html</footer>
 
-<!-- persistent song player, plays throughout -->
-<div class="mini-player">
+<!-- persistent mini player, appears once song starts -->
+<div class="mini-player" id="miniPlayer">
   <div class="mini-vinyl" id="miniVinyl"></div>
   <button class="mini-toggle" id="miniToggle">playing</button>
 </div>
 <audio id="audio" loop preload="auto" src="song.mp3"></audio>
 
 <script>
-  // ---- letter text ----
-  const letterText = "I don’t really know how to say this without it sounding like every other goodbye, so I’ll just say it plainly.
+  /* ============ CONFIG ============ */
+  const PHOTO_COUNT = 16;   // :photos/0.JPG through :photos/15.JPG
+  const VIDEO_COUNT = 9;    // :videos/0.MP4 through :videos/8.MP4
+  const photoPath = (i) => `:photos/${i}.JPG`;
+  const videoPath = (i) => `:videos/${i}.MP4`;
+  const songPath = 'song.mp3';
 
-These last few months meant more to me than I probably ever showed. Every photo, every video, every little memory in here reminds me that it was never about what we were doing. It was about who I was doing it with.
-
-You made the ordinary feel special. Somehow even the simplest days became the ones I wanted to hold on to, just because they were with you. That’s something I’ll always be grateful for.
-
-No matter what happens after today, I hope you know that none of this was ever fake to me. It was real. You were real. And I’m so thankful I got to experience this chapter of my life with you.
-
-Before we close it for good, I just have one last question. I hope you know this was real, and I'm glad we had it. Thank you, truly, for all of it.";
+  /* ============ LETTER ============ */
+  const letterText = "I don't really know how to say this without it sounding like every other goodbye, so I'll just say it plainly. These last months meant more to me than I probably showed. Every photo in that album, every clip, that dumb little song — none of it was special because of what we were doing, it was special because of who I was doing it with. You made ordinary days feel worth remembering, and that's not a small thing. I'm grateful for the version of me that got to know you, and for all the good, easy, unplanned moments in between. Whatever happens after today, I hope you know this was real, and I'm glad we had it. Thank you, truly, for all of it.";
   document.getElementById('letterText').textContent = letterText;
 
-  // ---- photo gallery: :photos/0.JPG – :photos/15.JPG ----
+  /* ============ PHOTO GALLERY ============ */
   const gallery = document.getElementById('gallery');
-  for(let i=0;i<=15;i++){
+  for(let i = 0; i < PHOTO_COUNT; i++){
     const fig = document.createElement('div');
     fig.className = 'polaroid';
     const img = document.createElement('img');
     img.loading = 'lazy';
     img.decoding = 'async';
-    img.src = `:photos/${i}.JPG`;
+    img.src = photoPath(i);
     img.alt = '';
     fig.appendChild(img);
     fig.addEventListener('click', () => openLightbox(img.src));
@@ -497,11 +490,10 @@ Before we close it for good, I just have one last question. I hope you know this
   document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('open'));
   lightbox.addEventListener('click', (e) => { if(e.target === lightbox) lightbox.classList.remove('open'); });
 
-  // ---- video strip: :videos/0.MP4 – :videos/8.MP4 ----
-  // autoplay requires muted; each card gets a tap-for-sound tag since browsers block audible autoplay
+  /* ============ VIDEO STRIP ============ */
   const videoStrip = document.getElementById('videoStrip');
   const videoEls = [];
-  for(let i=0;i<=8;i++){
+  for(let i = 0; i < VIDEO_COUNT; i++){
     const card = document.createElement('div');
     card.className = 'video-card';
 
@@ -510,13 +502,12 @@ Before we close it for good, I just have one last question. I hope you know this
     video.muted = true;
     video.loop = true;
     video.preload = 'none';
-    video.dataset.src = `:videos/${i}.MP4`;
+    video.dataset.src = videoPath(i);
 
     const soundTag = document.createElement('button');
     soundTag.className = 'sound-tag';
     soundTag.textContent = 'tap for sound';
     soundTag.addEventListener('click', () => {
-      // unmute this one, re-mute all others so only one plays with sound at a time
       videoEls.forEach(v => v.muted = true);
       document.querySelectorAll('.sound-tag').forEach(t => t.classList.remove('hide'));
       video.muted = false;
@@ -529,7 +520,7 @@ Before we close it for good, I just have one last question. I hope you know this
     videoEls.push(video);
   }
 
-  // load + autoplay each video once it's mostly in view, pause when it scrolls away
+  // autoplay (muted) each video once mostly in view, pause when scrolled away
   const videoObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       const v = entry.target;
@@ -543,30 +534,30 @@ Before we close it for good, I just have one last question. I hope you know this
   }, { threshold: 0.6 });
   videoEls.forEach(v => videoObserver.observe(v));
 
-  // ---- persistent song, starts on first tap and plays throughout ----
+  /* ============ SONG ============ */
   const audio = document.getElementById('audio');
+  const miniPlayer = document.getElementById('miniPlayer');
   const miniVinyl = document.getElementById('miniVinyl');
   const miniToggle = document.getElementById('miniToggle');
   const startBtn = document.getElementById('startBtn');
 
   function startSong(){
-    const playPromise = audio.play();
-    if(playPromise !== undefined){
-      playPromise.then(() => {
+    const p = audio.play();
+    if(p !== undefined){
+      p.then(() => {
         miniVinyl.classList.add('playing');
         miniToggle.textContent = 'playing';
-        startBtn.classList.add('playing');
+        miniPlayer.classList.add('show');
+        startBtn.textContent = 'playing ♥';
       }).catch((err) => {
         console.warn('song failed to start:', err);
-        // most likely the file path is wrong or the browser blocked it — surface it on the button
         startBtn.textContent = 'tap again ♥';
       });
     }
   }
 
   audio.addEventListener('error', () => {
-    console.warn('audio failed to load — check that song.mp3 is the correct path');
-    startBtn.textContent = "song didn't load";
+    console.warn('audio failed to load — confirm song.mp3 sits next to index.html');
   });
 
   startBtn.addEventListener('click', startSong);
@@ -583,14 +574,14 @@ Before we close it for good, I just have one last question. I hope you know this
     }
   });
 
-  // ---- next button reveals letter + closing, then scrolls to it ----
+  /* ============ NEXT BUTTON ============ */
   const afterVideos = document.getElementById('afterVideos');
   document.getElementById('nextBtn').addEventListener('click', () => {
     afterVideos.classList.add('show');
     afterVideos.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  // ---- yes / no ----
+  /* ============ YES / NO ============ */
   const note = document.getElementById('responseNote');
   const choices = document.getElementById('choices');
   document.getElementById('yesBtn').addEventListener('click', () => {
