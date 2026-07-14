@@ -446,11 +446,11 @@
     const fig = document.createElement('figure');
     fig.className = 'frame';
     fig.innerHTML = `
-      <img src="${i}.jpg" alt="memory ${i}"
+      <img src="photos/${i}.jpg" alt="memory ${i}"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
       <div class="ph-label" style="display:none;">
         <span class="big">${i}</span>
-        <span>${i}.jpg</span>
+        <span>photos/${i}.jpg</span>
       </div>
       <figcaption>${captions[i] || 'a memory'}</figcaption>
     `;
@@ -471,11 +471,11 @@
     card.innerHTML = `
       <video controls preload="none" playsinline
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <source src="${i}.mp4" type="video/mp4">
+        <source src="videos/${i}.mp4" type="video/mp4">
       </video>
       <div class="vfallback" style="display:none;">
         <span style="font-size:1.4rem;">▷</span>
-        <span>${i}.mp4</span>
+        <span>videos/${i}.mp4</span>
       </div>
       <p>${vCaptions[i] || 'a moment worth keeping'}</p>
     `;
