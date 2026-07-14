@@ -214,6 +214,7 @@
     flex: 0 0 auto;
     scroll-snap-align: center;
     width: min(300px, 76vw);
+    position: relative;
   }
 
   .video-card video{
@@ -225,6 +226,24 @@
     box-shadow: 0 14px 30px var(--shadow);
     display: block;
   }
+
+  .sound-tag{
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    background: rgba(122, 46, 66, 0.55);
+    color: white;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .sound-tag.hide{ display: none; }
 
   /* ---------- persistent mini player ---------- */
   .mini-player{
@@ -412,7 +431,7 @@
   <div class="mini-vinyl" id="miniVinyl"></div>
   <button class="mini-toggle" id="miniToggle">playing</button>
 </div>
-<audio id="audio" loop preload="none" src=":song.mp3"></audio>
+<audio id="audio" loop preload="auto" src=":song.mp3"></audio>
 
 <script>
   // ---- letter text ----
@@ -444,29 +463,49 @@
   lightbox.addEventListener('click', (e) => { if(e.target === lightbox) lightbox.classList.remove('open'); });
 
   // ---- video strip: :videos/0.MP4 – :videos/8.MP4 ----
+  // autoplay requires muted; each card gets a tap-for-sound tag since browsers block audible autoplay
   const videoStrip = document.getElementById('videoStrip');
   const videoEls = [];
   for(let i=0;i<=8;i++){
     const card = document.createElement('div');
     card.className = 'video-card';
+
     const video = document.createElement('video');
-    video.controls = true;
     video.playsInline = true;
+    video.muted = true;
+    video.loop = true;
     video.preload = 'none';
     video.dataset.src = `:videos/${i}.MP4`;
+
+    const soundTag = document.createElement('button');
+    soundTag.className = 'sound-tag';
+    soundTag.textContent = 'tap for sound';
+    soundTag.addEventListener('click', () => {
+      // unmute this one, re-mute all others so only one plays with sound at a time
+      videoEls.forEach(v => v.muted = true);
+      document.querySelectorAll('.sound-tag').forEach(t => t.classList.remove('hide'));
+      video.muted = false;
+      soundTag.classList.add('hide');
+    });
+
     card.appendChild(video);
+    card.appendChild(soundTag);
     videoStrip.appendChild(card);
     videoEls.push(video);
   }
 
-  // load video src only once it's near view, so all 9 don't load at once
+  // load + autoplay each video once it's mostly in view, pause when it scrolls away
   const videoObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if(entry.isIntersecting && !entry.target.src){
-        entry.target.src = entry.target.dataset.src;
+      const v = entry.target;
+      if(entry.isIntersecting){
+        if(!v.src) v.src = v.dataset.src;
+        v.play().catch(() => {});
+      } else {
+        v.pause();
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 300px 0px 300px' });
+  }, { threshold: 0.6 });
   videoEls.forEach(v => videoObserver.observe(v));
 
   // ---- persistent song, starts on first tap and plays throughout ----
@@ -476,14 +515,24 @@
   const startBtn = document.getElementById('startBtn');
 
   function startSong(){
-    audio.play().then(() => {
-      miniVinyl.classList.add('playing');
-      miniToggle.textContent = 'playing';
-      startBtn.classList.add('playing');
-    }).catch(() => {
-      // if blocked, mini player toggle still lets her start it manually
-    });
+    const playPromise = audio.play();
+    if(playPromise !== undefined){
+      playPromise.then(() => {
+        miniVinyl.classList.add('playing');
+        miniToggle.textContent = 'playing';
+        startBtn.classList.add('playing');
+      }).catch((err) => {
+        console.warn('song failed to start:', err);
+        // most likely the file path is wrong or the browser blocked it — surface it on the button
+        startBtn.textContent = 'tap again ♥';
+      });
+    }
   }
+
+  audio.addEventListener('error', () => {
+    console.warn('audio failed to load — check that :song.mp3 is the correct path');
+    startBtn.textContent = "song didn't load";
+  });
 
   startBtn.addEventListener('click', startSong);
 
