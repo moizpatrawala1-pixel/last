@@ -286,6 +286,25 @@
     font-family: 'Poppins', sans-serif;
   }
 
+  .next-wrap{
+    text-align: center;
+    margin-top: 56px;
+  }
+
+  .after-videos{
+    display: none;
+  }
+
+  .after-videos.show{
+    display: block;
+    animation: fade-up 0.6s ease;
+  }
+
+  @keyframes fade-up{
+    from{ opacity: 0; transform: translateY(20px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
   /* ---------- letter ---------- */
   .letter{ max-width: 640px; }
 
@@ -405,7 +424,13 @@
     <h2>the ones we filmed laughing</h2>
   </div>
   <div class="video-strip" id="videoStrip"></div>
+  <div class="next-wrap">
+    <button class="tap-note" id="nextBtn">next ♥</button>
+  </div>
 </section>
+
+<!-- LETTER + CLOSING, revealed after tapping next -->
+<div id="afterVideos" class="after-videos">
 
 <!-- LETTER -->
 <section>
@@ -424,6 +449,8 @@
   <div class="response-note" id="responseNote"></div>
 </section>
 
+</div>
+
 <footer>made with a lot of memory and a little html</footer>
 
 <!-- persistent song player, plays throughout -->
@@ -431,11 +458,19 @@
   <div class="mini-vinyl" id="miniVinyl"></div>
   <button class="mini-toggle" id="miniToggle">playing</button>
 </div>
-<audio id="audio" loop preload="auto" src=":song.mp3"></audio>
+<audio id="audio" loop preload="auto" src="song.mp3"></audio>
 
 <script>
   // ---- letter text ----
-  const letterText = "I don't really know how to say this without it sounding like every other goodbye, so I'll just say it plainly. These last months meant more to me than I probably showed. Every photo in that album, every clip, that dumb little song — none of it was special because of what we were doing, it was special because of who I was doing it with. You made ordinary days feel worth remembering, and that's not a small thing. I'm grateful for the version of me that got to know you, and for all the good, easy, unplanned moments in between. Whatever happens after today, I hope you know this was real, and I'm glad we had it. Thank you, truly, for all of it.";
+  const letterText = "I don’t really know how to say this without it sounding like every other goodbye, so I’ll just say it plainly.
+
+These last few months meant more to me than I probably ever showed. Every photo, every video, every little memory in here reminds me that it was never about what we were doing. It was about who I was doing it with.
+
+You made the ordinary feel special. Somehow even the simplest days became the ones I wanted to hold on to, just because they were with you. That’s something I’ll always be grateful for.
+
+No matter what happens after today, I hope you know that none of this was ever fake to me. It was real. You were real. And I’m so thankful I got to experience this chapter of my life with you.
+
+Before we close it for good, I just have one last question. I hope you know this was real, and I'm glad we had it. Thank you, truly, for all of it.";
   document.getElementById('letterText').textContent = letterText;
 
   // ---- photo gallery: :photos/0.JPG – :photos/15.JPG ----
@@ -530,7 +565,7 @@
   }
 
   audio.addEventListener('error', () => {
-    console.warn('audio failed to load — check that :song.mp3 is the correct path');
+    console.warn('audio failed to load — check that song.mp3 is the correct path');
     startBtn.textContent = "song didn't load";
   });
 
@@ -546,6 +581,13 @@
       miniVinyl.classList.remove('playing');
       miniToggle.textContent = 'paused';
     }
+  });
+
+  // ---- next button reveals letter + closing, then scrolls to it ----
+  const afterVideos = document.getElementById('afterVideos');
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    afterVideos.classList.add('show');
+    afterVideos.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
   // ---- yes / no ----
